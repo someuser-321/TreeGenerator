@@ -41,7 +41,7 @@ function setup()
 {	
 	createCanvas(window.innerWidth, window.innerHeight);
 	
-	slider_y = createSlider(100, 200, 150, 1);
+	slider_y = createSlider(100, 200, /mobile/i.test(window.navigator.userAgent) ? 100 : 150, 1);
 	slider_y.position(10, 10);
 	slider_level = createSlider(1, 13, 11, 1);
 	slider_level.position(10, 30);
@@ -108,7 +108,6 @@ function setup()
 	button_randomParams.mousePressed(function(){
 		randomSeed(paramSeed);
 		
-		slider_y.value(1*slider_y.value() + 0.1*(0.5-rand())*(slider_y.attribute('max') - slider_y.attribute('min')));
 		slider_level.value(1*slider_level.value() + 0.1*(0.5-rand())*(slider_level.attribute('max') - slider_level.attribute('min')));
 		slider_rot.value(1*slider_rot.value() + 0.1*(0.5-rand())*(slider_rot.attribute('max') - slider_rot.attribute('min')));
 		slider_lenRand.value(1*slider_lenRand.value() + 0.1*(0.5-rand())*(slider_lenRand.attribute('max') - slider_lenRand.attribute('min')));
@@ -154,14 +153,6 @@ function readInputs(updateTree)
 			loop();
 		}
 	}
-}
-
-function touchEnded()
-{
-	randSeed = Math.floor(Math.random()*1000);
-	prog = 100;
-	input_seed.value(randSeed);
-	startGrow();
 }
 
 function windowResized()
