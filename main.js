@@ -50,13 +50,13 @@ function setup()
 	slider_y.position(10, 10);
 	slider_level = createSlider(1, 13, 11, 1);
 	slider_level.position(10, 30);
-	slider_rot = createSlider(0, PI/2, (PI/2) / 4, (PI/2) / (3 * 5 * 8 * 1000));
+	slider_rot = createSlider(0, PI/2, (PI/2) / 4, (PI/2) / (3 * 5 * 8));
 	slider_rot.position(10, 50);
-	slider_lenRand = createSlider(0, 1, 1, 0.0001);
+	slider_lenRand = createSlider(0, 1, 1, 0.01);
 	slider_lenRand.position(10, 70);
 	slider_branchProb = createSlider(0, 1, 0.9, 0.01);
 	slider_branchProb.position(10, 90);
-	slider_rotRand = createSlider(0, 1, 0.1, 0.0001);
+	slider_rotRand = createSlider(0, 1, 0.1, 0.01);
 	slider_rotRand.position(10, 110);
 	slider_leafProb = createSlider(0, 1, 0.5, 0.01);
 	slider_leafProb.position(10, 130);
@@ -113,12 +113,12 @@ function setup()
 	button_randomParams.mousePressed(function(){
 		randomSeed(paramSeed);
 		
-		slider_level.value(1 * slider_level.value() + (rand2() > 0 ? 1 : 0) * slider_level.attribute('step'));
-		slider_rot.value(1 * slider_rot.value() + 100 * rand2() * slider_rot.attribute('step'));
-		slider_lenRand.value(1 * slider_lenRand.value() + 5 * rand2() * slider_lenRand.attribute('step'));
-		slider_branchProb.value(1 * slider_branchProb.value() + 5 * rand2() * slider_branchProb.attribute('step'));
-		slider_rotRand.value(1 * slider_rotRand.value() + 100 * rand2() * slider_rotRand.attribute('step'));
-		slider_leafProb.value(1 * slider_leafProb.value() + 5 * rand2() * slider_leafProb.attribute('step'));
+		slider_level.value(1 * slider_level.value() + 4 * rand2() * slider_level.attribute('step'));
+		slider_rot.value(1 * slider_rot.value() + 4 * rand2() * slider_rot.attribute('step'));
+		slider_lenRand.value(1 * slider_lenRand.value() + 4 * rand2() * slider_lenRand.attribute('step'));
+		slider_branchProb.value(1 * slider_branchProb.value() + 4 * rand2() * slider_branchProb.attribute('step'));
+		slider_rotRand.value(1 * slider_rotRand.value() + 4 * rand2() * slider_rotRand.attribute('step'));
+		slider_leafProb.value(1 * slider_leafProb.value() + 4 * rand2() * slider_leafProb.attribute('step'));
 		
 		paramSeed = 1000 * random();
 		randomSeed(randSeed);
