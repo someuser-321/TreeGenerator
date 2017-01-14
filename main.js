@@ -159,14 +159,14 @@ function readInputs(updateTree)
 	}
 }
 
-function touchStarted()
+function touchEnded()
 {
 	randSeed = Math.floor(Math.random()*1000);
 	prog = 100;
 	input_seed.value(randSeed);
 	startGrow();
 	
-	return false;
+	//return false;
 }
 
 function windowResized()
