@@ -170,7 +170,7 @@ function draw()
 	translate(width/2, height);
 	scale(1, -1);
 	
-	translate(0, 50);
+	translate(0, 20);
 	
 	branch(1, randSeed);
 	
