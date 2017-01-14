@@ -156,20 +156,19 @@ function readInputs(updateTree)
 	}
 }
 
-function touchEnded()
+function touchStarted()
 {
 	randSeed = Math.floor(Math.random()*1000);
 	prog = 100;
 	input_seed.value(randSeed);
 	startGrow();
+	
+	return false;
 }
 
-function deviceShaken()
+function windowResized()
 {
-	if ( !isFullScreen )
-		setTimeout(function(){fullscreen(true);isFullScreen=true}, 200);
-	else
-		setTimeout(function(){fullscreen(false);isFullScreen=false}, 200);
+	resizeCanvas(windowWidth, windowHeight);
 }
 
 function draw()
