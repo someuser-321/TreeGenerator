@@ -92,13 +92,13 @@ function setup()
 		startGrow();
 	});
 	
-	button_newSeed = createButton("Generate new seed");
+	button_newSeed = createButton("Generate new tree");
 	button_newSeed.position(10, 190);
 	button_newSeed.mousePressed(function(){
 		randSeed = Math.floor(Math.random()*1000);
 		prog = 100;
 		input_seed.value(randSeed);
-		loop();
+		startGrow();
 	});
 	
 	button_randomParams = createButton("Randomise parameters");
@@ -122,6 +122,7 @@ function setup()
 	
 	label_perf = createSpan('Generated in #ms');
 	label_perf.position(10, 250);
+	label_perf.style('display', 'none');
 	
 	
 	mX = mouseX;
@@ -129,7 +130,8 @@ function setup()
 	panX = 0;
 	panY = 0;
 	
-	readInputs(true);
+	readInputs(false);
+	startGrow();
 }
 
 function readInputs(updateTree)
@@ -223,9 +225,11 @@ function branch(level, seed)
 	{
 		var p = Math.min(1, Math.max(0, prog - level));
 		
-		var flowerSize = p*(1/6)*(len/level);
+		var flowerSize = y/100 * p * (1/6) * (len/level);
 
 		strokeWeight(1);
+		stroke(240 + 15*rand2(), 140 + 15*rand2(), 140 + 15*rand2());
+		
 		rotate(-PI);
 		for ( var i=0 ; i<=8 ; i++ )
 		{
@@ -264,4 +268,9 @@ function grow()
 function rand()
 {
 	return random(1000)/1000;
+}
+
+function rand2()
+{
+	return random(2000)/1000 - 1;
 }
