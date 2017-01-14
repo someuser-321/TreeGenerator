@@ -6,8 +6,9 @@ var slider_branchProb;
 var slider_rotRand;
 var slider_leafProb;
 
+var button_seed;
 var button_newSeed;
-var button_grow;
+var button_randomParams;
 
 var label_y;
 var label_level;
@@ -17,6 +18,9 @@ var label_branchProb;
 var label_rotRand;
 var label_leafProb;
 var label_perf;
+var label_seed;
+
+var input_seed;
 
 var y;
 var maxLevel;
@@ -27,17 +31,19 @@ var rotRand;
 var leafProb;
 
 var prog = 1;
+var growing = false;
 var randSeed = 80;
+var paramSeed = Math.floor(Math.random()*1000);
 
 function setup()
 {
 	createCanvas(window.innerWidth, window.innerHeight);
 	
-	slider_y = createSlider(0, 200, 150, 1);
+	slider_y = createSlider(100, 200, 150, 1);
 	slider_y.position(10, 10);
-	slider_level = createSlider(1, 16, 11, 1);
+	slider_level = createSlider(1, 13, 11, 1);
 	slider_level.position(10, 30);
-	slider_rot = createSlider(0, PI/2, (PI/2)/4, (PI/2)/(2*3*4*6*8*10));
+	slider_rot = createSlider(0, PI/2, (PI/2)/4, (PI/2)/(3*4*8*10));
 	slider_rot.position(10, 50);
 	slider_lenRand = createSlider(0, 1, 1, 0.01);
 	slider_lenRand.position(10, 70);
@@ -55,15 +61,9 @@ function setup()
 	slider_branchProb.input(function(){readInputs(true)});
 	slider_rotRand.input(function(){readInputs(true)});
 	slider_leafProb.input(function(){readInputs(true)});
+
 	
-	button_newSeed = createButton("Generate new tree");
-	button_newSeed.position(10, 160);
-	button_newSeed.mousePressed(function(){randSeed = Math.floor(Math.random()*1000); loop()});
-	button_grow = createButton("Grow!");
-	button_grow.position(10, 190);
-	button_grow.mousePressed(startGrow);
-	
-	label_y = createSpan('Branch length');
+	label_y = createSpan('Size');
 	label_y.position(150, 10);
 	label_level = createSpan('Recursion level');
 	label_level.position(150, 30);
@@ -78,8 +78,51 @@ function setup()
 	label_leafProb = createSpan('Flower probability');
 	label_leafProb.position(150, 130);
 	
+	label_seed = createSpan('Seed:');
+	label_seed.position(10, 162);
+	
+	input_seed = createInput(randSeed);
+	input_seed.position(50, 160);
+	input_seed.style('width', '50px')
+	
+	button_seed = createButton('Watch it grow!');
+	button_seed.position(110, 160);
+	button_seed.mousePressed(function() {
+		randSeed = input_seed.value();
+		startGrow();
+	});
+	
+	button_newSeed = createButton("Generate new seed");
+	button_newSeed.position(10, 190);
+	button_newSeed.mousePressed(function(){
+		randSeed = Math.floor(Math.random()*1000);
+		prog = 100;
+		input_seed.value(randSeed);
+		loop();
+	});
+	
+	button_randomParams = createButton("Randomise parameters");
+	button_randomParams.position(10, 220);
+	button_randomParams.mousePressed(function(){
+		randomSeed(paramSeed);
+		
+		slider_y.value(1*slider_y.value() + 0.1*(0.5-rand())*(slider_y.attribute('max') - slider_y.attribute('min')));
+		slider_level.value(1*slider_level.value() + 0.1*(0.5-rand())*(slider_level.attribute('max') - slider_level.attribute('min')));
+		slider_rot.value(1*slider_rot.value() + 0.1*(0.5-rand())*(slider_rot.attribute('max') - slider_rot.attribute('min')));
+		slider_lenRand.value(1*slider_lenRand.value() + 0.1*(0.5-rand())*(slider_lenRand.attribute('max') - slider_lenRand.attribute('min')));
+		slider_branchProb.value(1*slider_branchProb.value() + 0.1*(0.5-rand())*(slider_branchProb.attribute('max') - slider_branchProb.attribute('min')));
+		slider_rotRand.value(1*slider_rotRand.value() + 0.1*(0.5-rand())*(slider_rotRand.attribute('max') - slider_rotRand.attribute('min')));
+		slider_leafProb.value(1*slider_leafProb.value() + 0.1*(0.5-rand())*(slider_leafProb.attribute('max') - slider_leafProb.attribute('min')));
+		
+		paramSeed = 1000*random();
+		randomSeed(randSeed);
+		
+		readInputs(true);
+	});
+	
 	label_perf = createSpan('Generated in #ms');
-	label_perf.position(10, 220);
+	label_perf.position(10, 250);
+	
 	
 	mX = mouseX;
 	mY = mouseY;
@@ -93,7 +136,6 @@ function readInputs(updateTree)
 {
 	y = slider_y.value();
 	maxLevel = slider_level.value();
-	prog = maxLevel + 1;
 	rot = slider_rot.value();
 	lenRand = slider_lenRand.value();
 	branchProb = slider_branchProb.value();
@@ -101,7 +143,13 @@ function readInputs(updateTree)
 	leafProb = slider_leafProb.value();
 	
 	if ( updateTree )
-		loop();
+	{
+		if ( !growing )
+		{
+			prog = maxLevel + 1;
+			loop();
+		}
+	}
 }
 
 function draw()
@@ -189,9 +237,9 @@ function branch(level, seed)
 
 function startGrow()
 {
+	growing = true;
 	prog = 1;
 	grow();
-	
 }
 
 function grow()
@@ -200,6 +248,7 @@ function grow()
 	{
 		prog = maxLevel + 3;
 		loop();
+		growing = false;
 		return;
 	}
 	
