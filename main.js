@@ -145,13 +145,10 @@ function readInputs(updateTree)
 	rotRand = slider_rotRand.value();
 	leafProb = slider_leafProb.value();
 	
-	if ( updateTree )
+	if ( updateTree && !growing )
 	{
-		if ( !growing )
-		{
-			prog = maxLevel + 1;
-			loop();
-		}
+		prog = maxLevel + 1;
+		loop();
 	}
 }
 
