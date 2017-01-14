@@ -32,6 +32,8 @@ var leafProb;
 
 var prog = 1;
 var growing = false;
+var goFullScreen = false;
+
 var randSeed = 80;
 var paramSeed = Math.floor(Math.random()*1000);
 
@@ -152,6 +154,14 @@ function readInputs(updateTree)
 			loop();
 		}
 	}
+}
+
+function touchEnded()
+{
+	randSeed = Math.floor(Math.random()*1000);
+	prog = 100;
+	input_seed.value(randSeed);
+	startGrow();
 }
 
 function draw()
