@@ -39,6 +39,9 @@ var paramSeed = Math.floor(Math.random()*1000);
 
 function setup()
 {
+	if ( /mobile/i.test(navigator.userAgent) )
+		setTimeout(function(){window.scrollTo(0,1)}, 1000); 
+	
 	createCanvas(window.innerWidth, window.innerHeight);
 	
 	slider_y = createSlider(100, 200, 150, 1);
