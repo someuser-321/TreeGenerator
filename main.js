@@ -32,7 +32,7 @@ var leafProb;
 
 var prog = 1;
 var growing = false;
-var goFullScreen = false;
+var isFullScreen = false;
 
 var randSeed = 80;
 var paramSeed = Math.floor(Math.random()*1000);
@@ -162,6 +162,14 @@ function touchEnded()
 	prog = 100;
 	input_seed.value(randSeed);
 	startGrow();
+}
+
+function deviceShaken()
+{
+	if ( !isFullScreen )
+		setTimeout(function(){fullscreen(true);isFullScreen=true}, 200);
+	else
+		setTimeout(function(){fullscreen(false);isFullScreen=false}, 200);
 }
 
 function draw()
