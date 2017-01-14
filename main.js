@@ -9,6 +9,7 @@ var slider_leafProb;
 var button_seed;
 var button_newSeed;
 var button_randomParams;
+var button_change;
 
 var label_y;
 var label_level;
@@ -30,12 +31,16 @@ var branchProb;
 var rotRand;
 var leafProb;
 
+var hide = false;
+
 var prog = 1;
 var growing = false;
-var isFullScreen = false;
+var mutating = false;
 
 var randSeed = 80;
 var paramSeed = Math.floor(Math.random()*1000);
+var randBias = 0;
+
 
 function setup()
 {	
@@ -45,13 +50,13 @@ function setup()
 	slider_y.position(10, 10);
 	slider_level = createSlider(1, 13, 11, 1);
 	slider_level.position(10, 30);
-	slider_rot = createSlider(0, PI/2, (PI/2) / 4, (PI/2) / (3 * 5 * 8));
+	slider_rot = createSlider(0, PI/2, (PI/2) / 4, (PI/2) / (3 * 5 * 8 * 1000));
 	slider_rot.position(10, 50);
-	slider_lenRand = createSlider(0, 1, 1, 0.01);
+	slider_lenRand = createSlider(0, 1, 1, 0.0001);
 	slider_lenRand.position(10, 70);
 	slider_branchProb = createSlider(0, 1, 0.9, 0.01);
 	slider_branchProb.position(10, 90);
-	slider_rotRand = createSlider(0, 1, 0.1, 0.01);
+	slider_rotRand = createSlider(0, 1, 0.1, 0.0001);
 	slider_rotRand.position(10, 110);
 	slider_leafProb = createSlider(0, 1, 0.5, 0.01);
 	slider_leafProb.position(10, 130);
@@ -94,7 +99,7 @@ function setup()
 		startGrow();
 	});
 	
-	button_newSeed = createButton("Generate new tree");
+	button_newSeed = createButton('Generate new tree');
 	button_newSeed.position(10, 190);
 	button_newSeed.mousePressed(function(){
 		randSeed = Math.floor(Math.random() * 1000);
@@ -103,17 +108,17 @@ function setup()
 		startGrow();
 	});
 	
-	button_randomParams = createButton("Randomise parameters");
+	button_randomParams = createButton('Randomise parameters');
 	button_randomParams.position(10, 220);
 	button_randomParams.mousePressed(function(){
 		randomSeed(paramSeed);
 		
-		slider_level.value(1 * slider_level.value() + 0.1 * rand2() * (slider_level.attribute('max') - slider_level.attribute('min')));
-		slider_rot.value(1 * slider_rot.value() + 0.1 * rand2() * (slider_rot.attribute('max') - slider_rot.attribute('min')));
-		slider_lenRand.value(1 * slider_lenRand.value() + 0.1 * rand2() * (slider_lenRand.attribute('max') - slider_lenRand.attribute('min')));
-		slider_branchProb.value(1 * slider_branchProb.value() + 0.1 * rand2() * (slider_branchProb.attribute('max') - slider_branchProb.attribute('min')));
-		slider_rotRand.value(1 * slider_rotRand.value() + 0.1 * rand2() * (slider_rotRand.attribute('max') - slider_rotRand.attribute('min')));
-		slider_leafProb.value(1 * slider_leafProb.value() + 0.1 * rand2() * (slider_leafProb.attribute('max') - slider_leafProb.attribute('min')));
+		slider_level.value(1 * slider_level.value() + (rand2() > 0 ? 1 : 0) * slider_level.attribute('step'));
+		slider_rot.value(1 * slider_rot.value() + 100 * rand2() * slider_rot.attribute('step'));
+		slider_lenRand.value(1 * slider_lenRand.value() + 5 * rand2() * slider_lenRand.attribute('step'));
+		slider_branchProb.value(1 * slider_branchProb.value() + 5 * rand2() * slider_branchProb.attribute('step'));
+		slider_rotRand.value(1 * slider_rotRand.value() + 100 * rand2() * slider_rotRand.attribute('step'));
+		slider_leafProb.value(1 * slider_leafProb.value() + 5 * rand2() * slider_leafProb.attribute('step'));
 		
 		paramSeed = 1000 * random();
 		randomSeed(randSeed);
@@ -121,9 +126,30 @@ function setup()
 		readInputs(true);
 	});
 	
+	button_change = createButton('Enable wind');
+	button_change.position(10, 250);
+	button_change.mousePressed(function(){
+		if ( !mutating )
+		{
+			button_change.html('Disable wind')
+			mutateTime = millis();
+			mutating = true;
+			mutate();
+		}
+		else
+		{
+			button_change.html('Enable wind')
+			mutating = false;
+		}
+	});
+	
+	button_hide = createButton('Hide UI (click anywhere to show again)');
+	button_hide.position(10, 280);
+	button_hide.mousePressed(hideUI);
+	
 	label_perf = createSpan('Generated in #ms');
-	label_perf.position(10, 250);
-	label_perf.style('display', 'none');
+	label_perf.position(10, 310);
+	//label_perf.style('display', 'none');
 	
 	
 	mX = mouseX;
@@ -133,6 +159,71 @@ function setup()
 	
 	readInputs(false);
 	startGrow();
+}
+
+function mouseReleased()
+{
+	if ( hide )
+		showUI();
+	hide = !hide;
+}
+
+function showUI()
+{
+	slider_y.style('visibility', 'initial');
+	slider_level.style('visibility', 'initial');
+	slider_rot.style('visibility', 'initial');
+	slider_lenRand.style('visibility', 'initial');
+	slider_branchProb.style('visibility', 'initial');
+	slider_rotRand.style('visibility', 'initial');
+	slider_leafProb.style('visibility', 'initial');
+
+	button_seed.style('visibility', 'initial');
+	button_newSeed.style('visibility', 'initial');
+	button_randomParams.style('visibility', 'initial');
+	button_change.style('visibility', 'initial');
+	button_hide.style('visibility', 'initial');
+
+	label_y.style('visibility', 'initial');
+	label_level.style('visibility', 'initial');
+	label_rot.style('visibility', 'initial');
+	label_lenRand.style('visibility', 'initial');
+	label_branchProb.style('visibility', 'initial');
+	label_rotRand.style('visibility', 'initial');
+	label_leafProb.style('visibility', 'initial');
+	label_perf.style('visibility', 'initial');
+	label_seed.style('visibility', 'initial');
+
+	input_seed.style('visibility', 'initial');
+}
+
+function hideUI()
+{
+	slider_y.style('visibility', 'hidden');
+	slider_level.style('visibility', 'hidden');
+	slider_rot.style('visibility', 'hidden');
+	slider_lenRand.style('visibility', 'hidden');
+	slider_branchProb.style('visibility', 'hidden');
+	slider_rotRand.style('visibility', 'hidden');
+	slider_leafProb.style('visibility', 'hidden');
+
+	button_seed.style('visibility', 'hidden');
+	button_newSeed.style('visibility', 'hidden');
+	button_randomParams.style('visibility', 'hidden');
+	button_change.style('visibility', 'hidden');
+	button_hide.style('visibility', 'hidden');
+
+	label_y.style('visibility', 'hidden');
+	label_level.style('visibility', 'hidden');
+	label_rot.style('visibility', 'hidden');
+	label_lenRand.style('visibility', 'hidden');
+	label_branchProb.style('visibility', 'hidden');
+	label_rotRand.style('visibility', 'hidden');
+	label_leafProb.style('visibility', 'hidden');
+	label_perf.style('visibility', 'hidden');
+	label_seed.style('visibility', 'hidden');
+
+	input_seed.style('visibility', 'hidden');
 }
 
 function readInputs(updateTree)
@@ -150,6 +241,28 @@ function readInputs(updateTree)
 		prog = maxLevel + 1;
 		loop();
 	}
+}
+
+function mutate()
+{
+	if ( !mutating )
+		return;
+	
+	var startTime = millis();
+	randomSeed(paramSeed);
+	
+	randBias = 4 * (noise(startTime/20000) - 0.5);
+	
+	paramSeed = 1000 * random();
+	randomSeed(randSeed);
+	readInputs(true);
+	
+	var diff = millis() - startTime;
+	
+	if ( diff < 20 )
+		setTimeout(mutate, 20 - diff);
+	else
+		setTimeout(mutate, 1);
 }
 
 function windowResized()
@@ -205,8 +318,8 @@ function branch(level, seed)
 	if ( level < maxLevel )
 	{
 		
-		var r1 = rot * (1 + rand2() * rotRand);
-		var r2 = -rot * (1 + rand2() * rotRand);
+		var r1 = rot * (1 + rrand() * rotRand);
+		var r2 = -rot * (1 - rrand() * rotRand);
 		
 		if ( doBranch1 )
 		{
@@ -276,4 +389,9 @@ function rand()
 function rand2()
 {
 	return random(2000) / 1000 - 1;
+}
+
+function rrand()
+{
+	return rand2() + randBias;
 }
