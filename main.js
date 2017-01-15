@@ -20,6 +20,7 @@ var label_rotRand;
 var label_leafProb;
 var label_perf;
 var label_seed;
+var label_source;
 
 var input_seed;
 
@@ -151,6 +152,9 @@ function setup()
 	label_perf.position(10, 310);
 	//label_perf.style('display', 'none');
 	
+	label_source = createA('https://github.com/someuser-321/TreeGenerator', 'Check it out on GitHub!');
+	label_source.position(10, 330);
+	
 	
 	mX = mouseX;
 	mY = mouseY;
@@ -162,6 +166,13 @@ function setup()
 }
 
 function mouseReleased()
+{
+	if ( hide )
+		showUI();
+	hide = !hide;
+}
+
+function touchEnded()
 {
 	if ( hide )
 		showUI();
@@ -193,6 +204,7 @@ function showUI()
 	label_leafProb.style('visibility', 'initial');
 	label_perf.style('visibility', 'initial');
 	label_seed.style('visibility', 'initial');
+	label_source.style('visibility', 'initial');
 
 	input_seed.style('visibility', 'initial');
 }
@@ -222,6 +234,7 @@ function hideUI()
 	label_leafProb.style('visibility', 'hidden');
 	label_perf.style('visibility', 'hidden');
 	label_seed.style('visibility', 'hidden');
+	label_source.style('visibility', 'hidden');
 
 	input_seed.style('visibility', 'hidden');
 }
