@@ -264,7 +264,9 @@ function mutate()
 	var startTime = millis();
 	randomSeed(paramSeed);
 	
-	randBias = 4 * (noise(startTime/20000) - 0.5);
+	var n = noise(startTime/20000) - 0.5;
+	
+	randBias = 4 * Math.abs(n) * n;
 	
 	paramSeed = 1000 * random();
 	randomSeed(randSeed);
