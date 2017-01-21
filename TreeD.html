@@ -1,13 +1,41 @@
 <html>
 	<head>
 		<meta name="viewport" content="initial-scale=0.75,maximum-scale=0.75"/>
-		<title>Tree thing</title>
+		<title>TreeD thing</title>
 		<style>
-			* { font-family: monospace; }
-			body { margin: 0; padding: 0; border: 0; background-color: black; }
-			canvas { width: 100%; height: 100%; }
-			span { color: white; }
-			a { color: white; }
+			* {
+				font-family: monospace;
+				z-index: 10;
+			}
+			body {
+				margin: 0;
+				padding: 0;
+				border: 0;
+				background-color: black;
+			}
+			canvas {
+				width: 100%;
+				height: 100%;
+				z-index: 8;
+			}
+			span {
+				color: white;
+			}
+			a {
+				color: white;
+			}
+			div {
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				width: 330;
+				height: 400;
+				border-color: white;
+				border-width: 2;
+				border-style: solid;
+				background-color: rgba(0, 0, 0, 0.8);
+				z-index: 9;
+			}
         </style>
 	</head>
 	<body>

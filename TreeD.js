@@ -9,7 +9,8 @@ var slider_size,
 var button_seed,
 	button_newSeed,
 	button_randomParams,
-	button_change;
+	button_change,
+	button_rotation;
 
 var label_size,
 	label_level,
@@ -22,9 +23,12 @@ var label_size,
 	label_seed,
 	label_source,
 	label_source2;
+	
+var div_inputs;
 
-var input_seed,
-	size,
+var input_seed;
+
+var	size,
 	maxLevel,
 	rot,
 	lenRan,
@@ -44,7 +48,8 @@ var mouseX_,
 	mouseY_,
 	rotateX_ = 0,
 	rotateY_ = 0,
-	zoom = 2;
+	zoom = 2,
+	doRotate = true;
 	
 function setup()
 {	
@@ -52,11 +57,13 @@ function setup()
 	
 	var fov = 60 / 180 * PI;
 	var cameraZ = (height / 2) / tan(fov / 2);
-	perspective(60 / 180 * PI, width / height, cameraZ * 0.1, cameraZ * 10);
+	perspective(60 / 180 * PI, width / height, cameraZ * 0.001, cameraZ * 100);
+	
+	rotateX_ = PI/8;
 	
 	slider_size = createSlider(0, 1, 0.5, 0.01);
 	slider_size.position(10, 10);
-	slider_level = createSlider(1, 12, 10, 1);
+	slider_level = createSlider(1, 12, 9, 1);
 	slider_level.position(10, 30);
 	slider_rot = createSlider(0, 1, 0.125, 1 / (3 * 5 * 8));
 	slider_rot.position(10, 50);
@@ -147,25 +154,44 @@ function setup()
 		else
 		{
 			button_change.html('Enable wind')
+			randBias = 0;
 			mutating = false;
 		}
 	});
 	
-	button_hide = createButton('Hide UI (click anywhere to show again)');
-	button_hide.position(10, 280);
+	button_rotation = createButton('Disable rotation');
+	button_rotation.position(10, 280);
+	button_rotation.mousePressed(function(){
+		if ( doRotate )
+			button_rotation.html('Enable rotation')
+		else
+			button_rotation.html('Disable rotation')
+		
+		doRotate = !doRotate;
+	});
+	
+	button_hide = createButton('Hide UI (click this area to show again)');
+	button_hide.position(10, 310);
 	button_hide.mousePressed(hideUI);
 	
 	label_perf = createSpan('Generated in #ms');
-	label_perf.position(10, 310);
+	label_perf.position(10, 340);
 	//label_perf.style('display', 'none');
 	
 	label_source = createA('https://github.com/someuser-321/TreeGenerator', 'Check it out on GitHub!');
-	label_source.position(10, 330);
+	label_source.position(10, 360);
 	label_source2 = createA('https://someuser-321.github.io/TreeGenerator/index.html', 'Original 2D Version');
-	label_source2.position(10, 350);
+	label_source2.position(10, 380);
+	
+	div_inputs = createDiv('');
 	
 	mouseX_ = mouseX;
 	mouseY_ = mouseY;
+	
+	button_change.html('Disable wind')
+	mutateTime = millis();
+	mutating = true;
+	mutate();
 	
 	readInputs(false);
 	startGrow();
@@ -173,6 +199,9 @@ function setup()
 
 function mouseDragged()
 {
+	if ( mouseX < 330 && mouseY < 400 )
+		return true;
+	
 	rotateX_ += (mouseY - mouseY_) / 500;
 	rotateY_ += (mouseX - mouseX_) / 500;
 	
@@ -181,7 +210,7 @@ function mouseDragged()
 	
 	loop();
 	
-	//return false;
+	return false;
 }
 
 function mouseMoved()
@@ -189,7 +218,14 @@ function mouseMoved()
 	mouseX_ = mouseX;
 	mouseY_ = mouseY;
 	
-	return false;
+	if ( mouseX > 330 || mouseY > 400 )
+		return false;
+}
+
+function mouseClicked()
+{
+	if ( mouseX > 330 || mouseY > 400 )
+		return false;
 }
 
 function mouseWheel(event)
@@ -202,9 +238,13 @@ function mouseWheel(event)
 
 function mouseReleased()
 {
+	if ( mouseX > 330 || mouseY > 400 )
+		return false;
+	
 	if ( hide )
 		showUI();
 	hide = !hide;
+	
 }
 
 function touchEnded()
@@ -212,6 +252,8 @@ function touchEnded()
 	if ( hide )
 		showUI();
 	hide = !hide;
+	
+	return false;
 }
 
 function showUI()
@@ -228,6 +270,7 @@ function showUI()
 	button_newSeed.style('visibility', 'initial');
 	button_randomParams.style('visibility', 'initial');
 	button_change.style('visibility', 'initial');
+	button_rotation.style('visibility', 'initial');
 	button_hide.style('visibility', 'initial');
 
 	label_size.style('visibility', 'initial');
@@ -243,6 +286,8 @@ function showUI()
 	label_source2.style('visibility', 'initial');
 
 	input_seed.style('visibility', 'initial');
+	
+	div_inputs.style('visibility', 'initial');
 }
 
 function hideUI()
@@ -259,6 +304,7 @@ function hideUI()
 	button_newSeed.style('visibility', 'hidden');
 	button_randomParams.style('visibility', 'hidden');
 	button_change.style('visibility', 'hidden');
+	button_rotation.style('visibility', 'hidden');
 	button_hide.style('visibility', 'hidden');
 
 	label_size.style('visibility', 'hidden');
@@ -274,6 +320,8 @@ function hideUI()
 	label_source2.style('visibility', 'hidden');
 
 	input_seed.style('visibility', 'hidden');
+	
+	div_inputs.style('visibility', 'hidden');
 }
 
 function readInputs(updateTree)
@@ -295,15 +343,12 @@ function readInputs(updateTree)
 
 function mutate()
 {
-	if ( !mutating )
-		return;
-	
 	var startTime = millis();
 	randomSeed(paramSeed);
 	
 	var n = noise(startTime / 20000) - 0.5;
 	
-	randBias = 2 * Math.abs(n) * n;
+	randBias = 4 * Math.abs(n) * n * (mutating ? 1 : 0);
 	
 	paramSeed = 1000 * random();
 	randomSeed(randSeed);
@@ -320,12 +365,17 @@ function mutate()
 function windowResized()
 {
 	resizeCanvas(windowWidth, windowHeight);
+	
+	var fov = 60 / 180 * PI;
+	var cameraZ = (height / 2) / tan(fov / 2);
+	perspective(60 / 180 * PI, width / height, cameraZ * 0.1, cameraZ * 10);
+	
+	loop();
 }
 
 function draw()
 {
-	var startTime = millis();
-	
+	var startFrameTime = millis();
 	background(0, 0, 0);	
 	
 	ambientLight(20);
@@ -357,6 +407,8 @@ function draw()
 	rotate(-rotateX_, [1, 0, 0]);
 	rotate(rotateY_, [0, 1, 0]);
 	
+	pointLight(255, 255, 255, 1000, 1000, 1000);
+	
 	/*
 	ambientMaterial(255, 0, 0);
 	push();
@@ -378,10 +430,14 @@ function draw()
 	*/
 	
 	branch(1, randSeed);
-	pointLight(255, 255, 255, 1000, 1000, 1000);
 	
-	var endTime = millis();
-	label_perf.html('Generated in ' + Math.floor((endTime - startTime) * 10) / 10 + 'ms');
+	var frameTime = (millis() - startFrameTime);
+	label_perf.html('Generated in ' + Math.floor(frameTime * 10) / 10 + 'ms');
+	
+	var frameTime_ = Math.max(frameTime/1000, 1/(frameRate()||60));
+	
+	if ( doRotate )
+		rotateY_ += 1/180 * 2*PI * frameTime_;
 	
 	noLoop();
 }

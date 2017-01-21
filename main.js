@@ -22,6 +22,8 @@ var label_size,
 	label_seed,
 	label_source,
 	label_source2;
+	
+var div_inputs;
 
 var input_seed,
 	size,
@@ -142,7 +144,7 @@ function setup()
 		}
 	});
 	
-	button_hide = createButton('Hide UI (click anywhere to show again)');
+	button_hide = createButton('Hide UI (click this area to show again)');
 	button_hide.position(10, 280);
 	button_hide.mousePressed(hideUI);
 	
@@ -155,6 +157,7 @@ function setup()
 	label_source2 = createA('https://someuser-321.github.io/TreeGenerator/TreeD.html', 'See me in 3D!');
 	label_source2.position(10, 350);
 	
+	div_inputs = createDiv('');
 	
 	mX = mouseX;
 	mY = mouseY;
@@ -167,6 +170,9 @@ function setup()
 
 function mouseReleased()
 {
+	if ( mouseX > 330 || mouseY > 400 )
+		return false;
+	
 	if ( hide )
 		showUI();
 	hide = !hide;
@@ -177,6 +183,8 @@ function touchEnded()
 	if ( hide )
 		showUI();
 	hide = !hide;
+	
+	return false;
 }
 
 function showUI()
@@ -208,6 +216,8 @@ function showUI()
 	label_source2.style('visibility', 'initial');
 
 	input_seed.style('visibility', 'initial');
+	
+	div_inputs.style('visibility', 'initial');
 }
 
 function hideUI()
@@ -239,6 +249,8 @@ function hideUI()
 	label_source2.style('visibility', 'hidden');
 
 	input_seed.style('visibility', 'hidden');
+	
+	div_inputs.style('visibility', 'hidden');
 }
 
 function readInputs(updateTree)
