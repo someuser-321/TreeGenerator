@@ -378,7 +378,6 @@ function draw()
 	var startFrameTime = millis();
 	background(0, 0, 0);	
 	
-	ambientLight(20);
 	
 	scale(1, -1);
 	
@@ -404,10 +403,19 @@ function draw()
 	
 	translate(0, -height * (size+0.25), -zoom * height * size);
 	
+	
 	rotate(-rotateX_, [1, 0, 0]);
 	rotate(rotateY_, [0, 1, 0]);
 	
+	push();
+	rotate(-PI/2, [1, 0, 0]);
+	ambientMaterial(255, 255, 255);
+	plane(1000, -1000);
+	pop();
+	
+	ambientLight(20);
 	pointLight(255, 255, 255, 1000, 1000, 1000);
+	
 	
 	/*
 	ambientMaterial(255, 0, 0);
@@ -454,7 +462,7 @@ function branch(level, seed)
 		
 	var growthLevel = (prog - level > 1) || (prog >= maxLevel + 1) ? 1 : (prog - level);
 	
-	var width = 40 * size * Math.pow((maxLevel - level + 1) / maxLevel, 2);
+	var width = 50 * size * Math.pow((maxLevel - level + 1) / maxLevel, 2);
 	var len = growthLevel * size * height * (1 + rand2() * lenRand);
 	
 	translate(0, (len / level) / 2, 0);
@@ -473,8 +481,8 @@ function branch(level, seed)
 	{
 		var r11 = rot * PI * (1 + rand2() * rotRand + randWind());
 		var r12 = rot * PI * (1 + rand2() * rotRand + randWind());
-		var r21 = rot * PI * (1 + rand2() * rotRand + randWind());
-		var r22 = rot * PI * (1 + rand2() * rotRand + randWind());
+		var r21 = rot * PI * (1 + rand2() * rotRand - randWind());
+		var r22 = rot * PI * (1 + rand2() * rotRand - randWind());
 		
 		if ( doBranch1 )
 		{
@@ -546,5 +554,5 @@ function rand2()
 
 function randWind()
 {
-	return rand2() * randBias;
+	return /*rand2() **/ randBias;
 }
